@@ -1,5 +1,5 @@
 const core = require('@actions/core');
-const github = require('@actions/github'); // TODO: Not used until we publish API endpoint to the @action/github package
+// const github = require('@actions/github'); // TODO: Not used until we publish API endpoint to the @action/github package
 const fetch = require('node-fetch');
 
 // TODO
