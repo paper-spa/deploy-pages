@@ -23,16 +23,15 @@ async function create() {
       const pagesDeployEndpoint = `https://api.github.com/repos/${repositoryNwo}/pages/deployment`
       const artifactExgUrl = `${runTimeUrl}_apis/pipelines/workflows/${workflowRun}/artifacts?api-version=6.0-preview`
       core.info(`Artifact URL: ${artifactExgUrl}`);
-      const response = await axios.get(artifactExgUrl, {
+      const { data } = await axios.get(artifactExgUrl, {
           headers: {
               'Authorization': `Bearer ${runTimeToken}`,
               'Content-Type': 'application/json'
             }
       })
-      const data = await response.json()
       core.info(JSON.stringify(data))
       const artifactUrl = data.value[0].url
-      const uploadResponse = await axios.post(
+      const { data: uploadResponse } = await axios.post(
           pagesDeployEndpoint,
           { "artifact_url": artifactUrl, "pages_build_version": buildVersion },
           {
@@ -43,7 +42,7 @@ async function create() {
             },
       })
       core.info(`Created deployment for ${buildVersion}`)
-      core.info(JSON.stringify(uploadResponse.data))
+      core.info(JSON.stringify(uploadResponse))
     } catch (error) {
         core.info('Failed to create deployment.')
         core.setFailed(error.message);
