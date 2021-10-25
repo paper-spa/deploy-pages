@@ -45,7 +45,7 @@ async function create() {
       core.info(JSON.stringify(uploadResponse))
     } catch (error) {
         core.info('Failed to create deployment.')
-        core.setFailed(error.message);
+        core.setFailed(error);
     }
 }
 
