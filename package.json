@@ -1,0 +1,30 @@
+{
+  "name": "deploy-pages",
+  "version": "0.0.1",
+  "description": "Deploy an actions artifact to GitHub Pages",
+  "main": "index.js",
+  "dependencies": {
+    "@actions/artifact": "^0.5.2",
+    "@actions/core": "^1.6.0",
+    "node-fetch": "^3.0.0",
+    "tar": "^6.1.11"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/paper-spa/deploy-pages.git"
+  },
+  "keywords": [
+    "GitHub",
+    "Pages"
+  ],
+  "author": "GitHub",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/paper-spa/deploy-pages/issues"
+  },
+  "homepage": "https://github.com/paper-spa/deploy-pages#readme"
+}

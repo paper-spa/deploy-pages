@@ -1,0 +1,21 @@
+name: 'Deploy to GitHub Pages'
+description: 'A GitHub Action to deploy an artifact to GitHub Pages'
+runs:
+  using: 'node12'
+  main: 'index.js'
+inputs:
+  token:
+    description: 'GitHub token'
+    required: true
+  timeout:
+    description: 'Number of one second timeouts'
+    required: false
+    default: "3600"
+  error_count:
+    description: 'Number of errors allowed'
+    required: false
+    default: "10"
+  timeout_duration:
+    description: 'Number of milisecond to wait for a timeout'
+    required: false
+    default: "1000"
