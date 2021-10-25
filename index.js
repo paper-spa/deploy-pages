@@ -1,6 +1,6 @@
 const core = require('@actions/core');
 // const github = require('@actions/github'); // TODO: Not used until we publish API endpoint to the @action/github package
-const fetch = require('node-fetch');
+const axios = require('axios');
 
 // TODO
 // const tar = require('tar');
@@ -23,7 +23,7 @@ async function create() {
       const pagesDeployEndpoint = `https://api.github.com/repos/${repositoryNwo}/pages/deployment`
       const artifactExgUrl = `${runTimeUrl}_apis/pipelines/workflows/${workflowRun}/artifacts?api-version=6.0-preview`
       core.info(`Artifact URL: ${artifactExgUrl}`);
-      const response = await fetch(artifactExgUrl, {
+      const response = await axios.get(artifactExgUrl, {
           headers: {
               'Authorization': `Bearer ${runTimeToken}`,
               'Content-Type': 'application/json'
@@ -32,18 +32,18 @@ async function create() {
       const data = await response.json()
       core.info(JSON.stringify(data))
       const artifactUrl = data.value[0].url
-      const uploadResponse = await fetch(pagesDeployEndpoint, {
-          method: 'post',
-          headers: {
-              "Authorization": `Bearer ${githubToken}`,
-              "Content-type": "application/json",
-          },
-          body: JSON.stringify({ "artifact_url": artifactUrl, "pages_build_version": buildVersion })
-
+      const uploadResponse = await axios.post(
+          pagesDeployEndpoint,
+          { "artifact_url": artifactUrl, "pages_build_version": buildVersion },
+          {
+            headers: {
+                "Accept": 'application/json',
+                "Authorization": `Bearer ${githubToken}`,
+                "Content-type": "application/json",
+            },
       })
-      const uploadResponseData = await uploadResponse.json()
       core.info(`Created deployment for ${buildVersion}`)
-      core.info(JSON.stringify(uploadResponseData))
+      core.info(JSON.stringify(uploadResponse.data))
     } catch (error) {
         core.info('Failed to create deployment.')
         core.setFailed(error.message);
