@@ -108,5 +108,5 @@ async function main() {
 }
 
 main().then(() => {
-    core.info('Success!');
+    core.info('Run completed');
 })
