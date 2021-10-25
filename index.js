@@ -31,7 +31,7 @@ async function create() {
       })
       core.info(JSON.stringify(data))
       const artifactUrl = data.value[0].url
-      const { data: uploadResponse } = await axios.post(
+      const response = await axios.post(
           pagesDeployEndpoint,
           { "artifact_url": artifactUrl, "pages_build_version": buildVersion },
           {
@@ -41,6 +41,7 @@ async function create() {
                 "Content-type": "application/json",
             },
       })
+      core.info(`Response from create call: ${response}`)
       core.info(`Created deployment for ${buildVersion}`)
       core.info(JSON.stringify(uploadResponse))
     } catch (error) {
