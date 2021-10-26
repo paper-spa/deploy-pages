@@ -36,7 +36,7 @@ async function create() {
           { "artifact_url": artifactUrl, "pages_build_version": buildVersion },
           {
             headers: {
-                "Accept": 'application/json',
+                "Accept": "application/vnd.github.v3+json",
                 "Authorization": `Bearer ${githubToken}`,
                 "Content-type": "application/json",
             },
