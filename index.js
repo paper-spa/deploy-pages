@@ -42,9 +42,8 @@ async function create() {
                 "Content-type": "application/json",
             },
       })
-      core.info(`Response from create call: ${response}`)
       core.info(`Created deployment for ${buildVersion}`)
-      core.info(JSON.stringify(uploadResponse))
+      core.info(JSON.stringify(response))
     } catch (error) {
         core.info('Failed to create deployment.')
         core.setFailed(error);
