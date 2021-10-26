@@ -54,7 +54,7 @@ async function create() {
 async function check() {
     try {
         const api_token = core.getInput('token');
-        const url = core.getInput('status_url');
+        const statusUrl = `https://api.github.com/repos/${process.env["GITHUB_REPOSITORY"]}/pages/${process.env["GITHUB_SHA"]}/deployment_status`
         const timeout = core.getInput('timeout');
         const timeout_duration = core.getInput('timeout_duration');
         const error_count_max = core.getInput('error_count');
@@ -63,7 +63,7 @@ async function check() {
         while (tries < timeout) {
             tries++;
             await new Promise(r => setTimeout(r, timeout_duration));
-            var res = await axios.get(url, {
+            var res = await axios.get(statusUrl, {
                 headers: {
                     'Authorization': `token ${api_token}`
                 }
@@ -103,7 +103,7 @@ async function main() {
         await create()
         await check()
 
-    } catch (err) {
+    } catch (error) {
         core.setFailed(error)
     }
 }
