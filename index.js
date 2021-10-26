@@ -20,6 +20,7 @@ async function create() {
       const repositoryNwo = process.env["GITHUB_REPOSITORY"]
       const githubToken = process.env["GITHUB_TOKEN"];
       const buildVersion = process.env["GITHUB_SHA"];
+      const inputToken = core.getInput('token');
       const pagesDeployEndpoint = `https://api.github.com/repos/${repositoryNwo}/pages/deployment`
       const artifactExgUrl = `${runTimeUrl}_apis/pipelines/workflows/${workflowRun}/artifacts?api-version=6.0-preview`
       core.info(`Artifact URL: ${artifactExgUrl}`);
@@ -37,7 +38,7 @@ async function create() {
           {
             headers: {
                 "Accept": "application/vnd.github.v3+json",
-                "Authorization": `Bearer ${githubToken}`,
+                "Authorization": `Bearer ${inputToken}`,
                 "Content-type": "application/json",
             },
       })
