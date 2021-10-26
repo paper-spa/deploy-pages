@@ -43,7 +43,7 @@ async function create() {
             },
       })
       core.info(`Created deployment for ${buildVersion}`)
-      core.info(JSON.stringify(response))
+      core.info(JSON.stringify(response.data))
     } catch (error) {
         core.info('Failed to create deployment.')
         core.setFailed(error);
@@ -93,7 +93,7 @@ async function check() {
             core.setFailed("Timeout reached, aborting!")
         }
     } catch (error) {
-        core.setFailed(error.message);
+        core.setFailed(error);
     }
 }
 
@@ -104,7 +104,7 @@ async function main() {
         await check()
 
     } catch (err) {
-        core.setFailed(error.message)
+        core.setFailed(error)
     }
 }
 
