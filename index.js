@@ -20,6 +20,12 @@ async function create() {
       const repositoryNwo = process.env["GITHUB_REPOSITORY"]
       const githubToken = process.env["GITHUB_TOKEN"];
       const buildVersion = process.env["GITHUB_SHA"];
+      const buildActor = process.env["GITHUB_ACTOR"]
+      const actionsId = process.env["GITHUB_ACTION"];
+      const actionsPath = process.env["GITHUB_ACTION_PATH"]
+      core.info(`Actor: ${buildActor}`)
+      core.info(`Action ID: ${actionsId}`)
+      core.info(`Action path: ${actionsPath}`)
       const inputToken = core.getInput('token');
       const pagesDeployEndpoint = `https://api.github.com/repos/${repositoryNwo}/pages/deployment`
       const artifactExgUrl = `${runTimeUrl}_apis/pipelines/workflows/${workflowRun}/artifacts?api-version=6.0-preview`
