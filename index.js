@@ -37,7 +37,7 @@ async function create() {
             }
       })
       core.info(JSON.stringify(data))
-      const artifactUrl = data.value[0].url
+      const artifactUrl = `${data.value[0].url}&%24expand=SignedContent`
       const response = await axios.post(
           pagesDeployEndpoint,
           { "artifact_url": artifactUrl, "pages_build_version": buildVersion },
