@@ -5726,14 +5726,15 @@ exports.debug = debug; // for test
 /***/ 1319:
 /***/ ((module) => {
 
+// Load variables from Actions runtime
 module.exports = {
   runTimeUrl: process.env.ACTIONS_RUNTIME_URL,
   workflowRun: process.env.GITHUB_RUN_ID,
   runTimeToken: process.env.ACTIONS_RUNTIME_TOKEN,
-  repositoryNwo: process.env.GITHUB_REPOSITOR,
+  repositoryNwo: process.env.GITHUB_REPOSITORY,
   githubToken: process.env.GITHUB_TOKEN,
   buildVersion: process.env.GITHUB_SHA,
-  buildActor: process.env.GITHUB_ACTO,
+  buildActor: process.env.GITHUB_ACTOR,
   actionsId: process.env.GITHUB_ACTION,
   actionsPath: process.env.GITHUB_ACTION_PATH
 }
@@ -5894,24 +5895,24 @@ module.exports = require("zlib");
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
-const core = __nccwpck_require__(2186)
-// const github = require('@actions/github'); // TODO: Not used until we publish API endpoint to the @action/github package
-const axios = __nccwpck_require__(6545)
-const context = __nccwpck_require__(1319)
-
-// TODO
-// const tar = require('tar')
-
 // This package assumes a site has already been built and the files exist in the current workspace
 // If there's an artifact named `artifact.tar`, it can upload that to actions on its own,
 // without the user having to do the tar process themselves.
+
+const core = __nccwpck_require__(2186)
+// const github = require('@actions/github'); // TODO: Not used until we publish API endpoint to the @action/github package
+const axios = __nccwpck_require__(6545)
+
+// All variables we need from the runtime are loaded here
+const context = __nccwpck_require__(1319)
+
+// TODO: If the artifact hasn't been created, we can create it and upload to artifact storage ourselves
+// const tar = require('tar')
 
 // Ask the runtime for the unsigned artifact URL and deploy to GitHub Pages
 // by creating a deployment with that artifact
 async function create() {
   try {
-    // Get the actions runtime
-
     core.info(`Actor: ${context.buildActor}`)
     core.info(`Action ID: ${context.actionsId}`)
     core.info(`Action path: ${context.actionsPath}`)
@@ -5992,8 +5993,17 @@ async function check() {
   }
 }
 
+function ensureContext() {
+  for (const variable in context) {
+    if (context[variable] === undefined) {
+      return core.setFailed(`${variable} is undefined. Cannot continue.`)
+    }
+  }
+  core.debug('all variables are set')
+}
 async function main() {
   try {
+    ensureContext()
     await create()
     await check()
   } catch (error) {
