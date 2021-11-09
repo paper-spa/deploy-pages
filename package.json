@@ -2,7 +2,7 @@
   "name": "deploy-pages",
   "version": "0.0.1",
   "description": "Deploy an actions artifact to GitHub Pages",
-  "main": "index.js",
+  "main": "./dist/index.js",
   "dependencies": {
     "@actions/artifact": "^0.5.2",
     "@actions/core": "^1.6.0",
@@ -11,13 +11,18 @@
   },
   "devDependencies": {
     "@github/prettier-config": "0.0.4",
+    "@vercel/ncc": "^0.31.1",
     "eslint": "^8.2.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-github": "^4.3.4",
+    "jest": "^27.3.1",
     "prettier": "^2.4.1"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint .",
+    "prepare": "ncc build src/index.js -o dist --source-map --license licenses.txt",
+    "test": "jest",
+    "all": "npm run lint && npm run prepare && npm run test"
   },
   "repository": {
     "type": "git",
