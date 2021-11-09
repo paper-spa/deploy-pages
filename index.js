@@ -1,4 +1,4 @@
-const core = require('@actions/core');
+const core = require('@actions/core')
 // const github = require('@actions/github'); // TODO: Not used until we publish API endpoint to the @action/github package
 const axios = require('axios');
 
@@ -14,15 +14,7 @@ const axios = require('axios');
 async function create() {
     try {
       // Get the actions runtime
-      const runTimeUrl = process.env["ACTIONS_RUNTIME_URL"];
-      const workflowRun = process.env["GITHUB_RUN_ID"];
-      const runTimeToken = process.env["ACTIONS_RUNTIME_TOKEN"];
-      const repositoryNwo = process.env["GITHUB_REPOSITORY"]
-      const githubToken = process.env["GITHUB_TOKEN"];
-      const buildVersion = process.env["GITHUB_SHA"];
-      const buildActor = process.env["GITHUB_ACTOR"]
-      const actionsId = process.env["GITHUB_ACTION"];
-      const actionsPath = process.env["GITHUB_ACTION_PATH"]
+
       core.info(`Actor: ${buildActor}`)
       core.info(`Action ID: ${actionsId}`)
       core.info(`Action path: ${actionsPath}`)
@@ -60,7 +52,7 @@ async function create() {
 async function check() {
     try {
         const api_token = core.getInput('token');
-        const statusUrl = `https://api.github.com/repos/${process.env["GITHUB_REPOSITORY"]}/pages/${process.env["GITHUB_SHA"]}/deployment_status`
+        const statusUrl = `https://api.github.com/repos/${process.env["GITHUB_REPOSITORY"]}/pages/deployment/status/${process.env["GITHUB_SHA"]}`
         const timeout = core.getInput('timeout');
         const timeout_duration = core.getInput('timeout_duration');
         const error_count_max = core.getInput('error_count');
