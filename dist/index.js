@@ -5965,11 +5965,11 @@ async function check() {
       })
 
       if (res.data.status == 'succeed') {
-        console.log('Reported success!')
+        core.info('Reported success!')
         core.setOutput('status', 'succeed')
         break
       } else {
-        console.log('Current status: ' + res.data.status)
+        core.info('Current status: ' + res.data.status)
       }
 
       if (res.status != 200) {
@@ -5977,13 +5977,13 @@ async function check() {
       }
 
       if (error_count >= error_count_max) {
-        console.log('Too many errors, aborting!')
+        core.info('Too many errors, aborting!')
         core.setFailed('Failed with status code: ' + res.status)
         break
       }
     }
     if (tries >= timeout) {
-      console.log('Timeout reached, aborting!')
+      core.info('Timeout reached, aborting!')
       core.setFailed('Timeout reached, aborting!')
     }
   } catch (error) {
