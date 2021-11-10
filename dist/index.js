@@ -5724,7 +5724,9 @@ exports.debug = debug; // for test
 /***/ }),
 
 /***/ 1319:
-/***/ ((module) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const core = __nccwpck_require__(2186)
 
 // Load variables from Actions runtime
 module.exports = {
@@ -5732,8 +5734,10 @@ module.exports = {
   workflowRun: process.env.GITHUB_RUN_ID,
   runTimeToken: process.env.ACTIONS_RUNTIME_TOKEN,
   repositoryNwo: process.env.GITHUB_REPOSITORY,
+  buildVersion: process.env.GITHUB_SHA,
   buildActor: process.env.GITHUB_ACTOR,
-  actionsId: process.env.GITHUB_ACTION
+  actionsId: process.env.GITHUB_ACTION,
+  githubToken: core.getInput('token')
 }
 
 
