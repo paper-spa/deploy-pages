@@ -5737,7 +5737,6 @@ module.exports = {
   buildVersion: process.env.GITHUB_SHA,
   buildActor: process.env.GITHUB_ACTOR,
   actionsId: process.env.GITHUB_ACTION,
-  actionsPath: process.env.GITHUB_ACTION_PATH,
   githubToken: core.getInput('token')
 }
 
@@ -5917,7 +5916,6 @@ async function create() {
   try {
     core.info(`Actor: ${context.buildActor}`)
     core.info(`Action ID: ${context.actionsId}`)
-    core.info(`Action path: ${context.actionsPath}`)
     const pagesDeployEndpoint = `https://api.github.com/repos/${context.repositoryNwo}/pages/deployment`
     const artifactExgUrl = `${context.runTimeUrl}_apis/pipelines/workflows/${context.workflowRun}/artifacts?api-version=6.0-preview`
     core.info(`Artifact URL: ${artifactExgUrl}`)
