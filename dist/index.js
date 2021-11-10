@@ -5734,7 +5734,6 @@ module.exports = {
   workflowRun: process.env.GITHUB_RUN_ID,
   runTimeToken: process.env.ACTIONS_RUNTIME_TOKEN,
   repositoryNwo: process.env.GITHUB_REPOSITORY,
-  buildVersion: process.env.GITHUB_SHA,
   buildActor: process.env.GITHUB_ACTOR,
   actionsId: process.env.GITHUB_ACTION,
   githubToken: core.getInput('token')
@@ -5994,7 +5993,7 @@ async function check() {
 function ensureContext() {
   for (const variable in context) {
     if (context[variable] === undefined) {
-      return core.setFailed(`${variable} is undefined. Cannot continue.`)
+      throw new Error(`${variable} is undefined. Cannot continue.`)
     }
   }
   core.debug('all variables are set')
