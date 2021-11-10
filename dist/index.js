@@ -5724,9 +5724,7 @@ exports.debug = debug; // for test
 /***/ }),
 
 /***/ 1319:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-const core = __nccwpck_require__(2186)
+/***/ ((module) => {
 
 // Load variables from Actions runtime
 module.exports = {
@@ -5735,8 +5733,7 @@ module.exports = {
   runTimeToken: process.env.ACTIONS_RUNTIME_TOKEN,
   repositoryNwo: process.env.GITHUB_REPOSITORY,
   buildActor: process.env.GITHUB_ACTOR,
-  actionsId: process.env.GITHUB_ACTION,
-  githubToken: core.getInput('token')
+  actionsId: process.env.GITHUB_ACTION
 }
 
 
@@ -6008,9 +6005,7 @@ async function main() {
   }
 }
 
-main().then(() => {
-  core.info('Run completed')
-})
+main()
 
 })();
 

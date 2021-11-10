@@ -111,6 +111,4 @@ async function main() {
   }
 }
 
-main().then(() => {
-  core.info('Run completed')
-})
+main()
