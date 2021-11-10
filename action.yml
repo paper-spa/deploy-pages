@@ -6,6 +6,7 @@ runs:
 inputs:
   token:
     description: 'GitHub token'
+    default: ${{ secrets.GITHUB_TOKEN }}
     required: true
   timeout:
     description: 'Number of one second timeouts'
