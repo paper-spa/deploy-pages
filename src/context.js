@@ -9,6 +9,5 @@ module.exports = {
   buildVersion: process.env.GITHUB_SHA,
   buildActor: process.env.GITHUB_ACTOR,
   actionsId: process.env.GITHUB_ACTION,
-  actionsPath: process.env.GITHUB_ACTION_PATH,
   githubToken: core.getInput('token')
 }
