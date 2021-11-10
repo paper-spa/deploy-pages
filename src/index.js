@@ -96,7 +96,7 @@ async function check() {
 function ensureContext() {
   for (const variable in context) {
     if (context[variable] === undefined) {
-      return core.setFailed(`${variable} is undefined. Cannot continue.`)
+      throw new Error(`${variable} is undefined. Cannot continue.`)
     }
   }
   core.debug('all variables are set')
