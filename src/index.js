@@ -19,7 +19,6 @@ async function create() {
     core.info(`Actor: ${context.buildActor}`)
     core.info(`Action ID: ${context.actionsId}`)
     core.info(`Action path: ${context.actionsPath}`)
-    const inputToken = core.getInput('token')
     const pagesDeployEndpoint = `https://api.github.com/repos/${context.repositoryNwo}/pages/deployment`
     const artifactExgUrl = `${context.runTimeUrl}_apis/pipelines/workflows/${context.workflowRun}/artifacts?api-version=6.0-preview`
     core.info(`Artifact URL: ${artifactExgUrl}`)
@@ -37,7 +36,7 @@ async function create() {
       {
         headers: {
           Accept: 'application/vnd.github.v3+json',
-          Authorization: `Bearer ${inputToken}`,
+          Authorization: `Bearer ${context.githubToken}`,
           'Content-type': 'application/json'
         }
       }
@@ -53,8 +52,7 @@ async function create() {
 // Poll the deployment endpoint for status
 async function check() {
   try {
-    const api_token = core.getInput('token')
-    const statusUrl = `https://api.github.com/repos/${process.env['GITHUB_REPOSITORY']}/pages/deployment/status/${process.env['GITHUB_SHA']}`
+    const statusUrl = `https://api.github.com/repos/${context.repositoryNwo}/pages/deployment/status/${process.env['GITHUB_SHA']}`
     const timeout = core.getInput('timeout')
     const timeout_duration = core.getInput('timeout_duration')
     const error_count_max = core.getInput('error_count')
@@ -65,7 +63,7 @@ async function check() {
       await new Promise(r => setTimeout(r, timeout_duration))
       var res = await axios.get(statusUrl, {
         headers: {
-          Authorization: `token ${api_token}`
+          Authorization: `token ${context.githubToken}`
         }
       })
 
