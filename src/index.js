@@ -79,7 +79,7 @@ async function check() {
         break
       } else if (res.data.status == 'deployment_attempt_error') {
 
-        // A temporary error happened, a retry will be schedule automatically.
+        // A temporary error happened, a retry will be scheduled automatically.
         core.info('Deployment temporarily failed, a retry will be automatically scheduled...')
       } else {
         core.info('Current status: ' + res.data.status)
