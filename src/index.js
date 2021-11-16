@@ -127,7 +127,7 @@ async function cancelHandler(evtOrExitCodeOrError) {
   try {
     const pagesCancelDeployEndpoint = `https://api.github.com/repos/${context.repositoryNwo}/pages/deployment/cancel/${context.buildVersion}`
     await axios.put(
-      pagesCancelDeployEndpoint,
+      pagesCancelDeployEndpoint, {},
       {
         headers: {
           Accept: 'application/vnd.github.v3+json',
