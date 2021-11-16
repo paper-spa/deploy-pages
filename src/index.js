@@ -135,7 +135,7 @@ async function cancelHandler(evtOrExitCodeOrError) {
     //     }
     //   }
     // )
-    core.info("canceled")
+    core.info(`canceled thru ${pagesCancelDeployEndpoint}`)
   } catch (e) {
     console.info('cancel deployment errored', e)
   }

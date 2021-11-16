@@ -6023,16 +6023,17 @@ async function main() {
 async function cancelHandler(evtOrExitCodeOrError) {
   try {
     const pagesCancelDeployEndpoint = `https://api.github.com/repos/${context.repositoryNwo}/pages/deployment/cancel/${context.buildVersion}`
-    await axios.put(
-      pagesCancelDeployEndpoint,
-      {
-        headers: {
-          Accept: 'application/vnd.github.v3+json',
-          Authorization: `Bearer ${context.githubToken}`,
-          'Content-type': 'application/json'
-        }
-      }
-    )
+    // await axios.put(
+    //   pagesCancelDeployEndpoint,
+    //   {
+    //     headers: {
+    //       Accept: 'application/vnd.github.v3+json',
+    //       Authorization: `Bearer ${context.githubToken}`,
+    //       'Content-type': 'application/json'
+    //     }
+    //   }
+    // )
+    core.info(`canceled thru ${pagesCancelDeployEndpoint}`)
   } catch (e) {
     console.info('cancel deployment errored', e)
   }
