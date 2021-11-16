@@ -6020,6 +6020,29 @@ async function main() {
   }
 }
 
+async function cancelHandler(evtOrExitCodeOrError) {
+  try {
+    const pagesCancelDeployEndpoint = `https://api.github.com/repos/${context.repositoryNwo}/pages/deployment/cancel/${context.buildVersion}`
+    await axios.put(
+      pagesCancelDeployEndpoint,
+      {
+        headers: {
+          Accept: 'application/vnd.github.v3+json',
+          Authorization: `Bearer ${context.githubToken}`,
+          'Content-type': 'application/json'
+        }
+      }
+    )
+  } catch (e) {
+    console.info('cancel deployment errored', e)
+  }
+  process.exit(isNaN(+evtOrExitCodeOrError) ? 1 : +evtOrExitCodeOrError)
+}
+
+[
+  'SIGINT',  'SIGTERM',
+].forEach(evt => process.on(evt, cancelHandler))
+
 main()
 
 })();
