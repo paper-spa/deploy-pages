@@ -12,6 +12,8 @@ const context = require('./context')
 // TODO: If the artifact hasn't been created, we can create it and upload to artifact storage ourselves
 // const tar = require('tar')
 
+let requestedDeployment = false
+
 // Ask the runtime for the unsigned artifact URL and deploy to GitHub Pages
 // by creating a deployment with that artifact
 async function create() {
@@ -29,7 +31,6 @@ async function create() {
     })
     core.info(JSON.stringify(data))
     const artifactUrl = `${data.value[0].url}&%24expand=SignedContent`
-    await new Promise(r => setTimeout(r, 30000))
     const response = await axios.post(
       pagesDeployEndpoint,
       {artifact_url: artifactUrl, pages_build_version: context.buildVersion},
@@ -41,6 +42,7 @@ async function create() {
         }
       }
     )
+    requestedDeployment = true
     core.info(`Created deployment for ${context.buildVersion}`)
     core.info(JSON.stringify(response.data))
   } catch (error) {
@@ -125,18 +127,20 @@ async function main() {
 
 async function cancelHandler(evtOrExitCodeOrError) {
   try {
-    const pagesCancelDeployEndpoint = `https://api.github.com/repos/${context.repositoryNwo}/pages/deployment/cancel/${context.buildVersion}`
-    await axios.put(
-      pagesCancelDeployEndpoint, {},
-      {
-        headers: {
-          Accept: 'application/vnd.github.v3+json',
-          Authorization: `Bearer ${context.githubToken}`,
-          'Content-type': 'application/json'
+    if (requestedDeployment) {
+      const pagesCancelDeployEndpoint = `https://api.github.com/repos/${context.repositoryNwo}/pages/deployment/cancel/${context.buildVersion}`
+      await axios.put(
+        pagesCancelDeployEndpoint, {},
+        {
+          headers: {
+            Accept: 'application/vnd.github.v3+json',
+            Authorization: `Bearer ${context.githubToken}`,
+            'Content-type': 'application/json'
+          }
         }
-      }
-    )
-    core.info(`canceled thru ${pagesCancelDeployEndpoint}`)
+      )
+      core.info(`canceled ongoing deployment thru ${pagesCancelDeployEndpoint}`)
+    }
   } catch (e) {
     console.info('cancel deployment errored', e)
   }
