@@ -5942,7 +5942,8 @@ async function create() {
     core.info(JSON.stringify(response.data))
   } catch (error) {
     core.info('Failed to create deployment.')
-    core.setFailed(error)
+    // Throw the error, so it will skip check deployment status. This error will be caught again in global try catch.
+    throw error
   }
 }
 
@@ -5968,6 +5969,16 @@ async function check() {
         core.info('Reported success!')
         core.setOutput('status', 'succeed')
         break
+      } else if (res.data.status == 'deployment_failed') {
+
+        // Fall into permanent error, it may be caused by ongoing incident or malicious deployment content or exhausted automatic retry times.
+        core.info('Deployment failed, please retry later.')
+        core.setOutput('status', 'failed')
+        break
+      } else if (res.data.status == 'deployment_attempt_error') {
+
+        // A temporary error happened, a retry will be scheduled automatically.
+        core.info('Deployment temporarily failed, a retry will be automatically scheduled...')
       } else {
         core.info('Current status: ' + res.data.status)
       }
