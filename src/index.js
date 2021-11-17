@@ -67,7 +67,7 @@ class Deployment {
   // Poll the deployment endpoint for status
   async check() {
     try {
-      const statusUrl = `https://api.github.com/repos/${this.repositoryNwo}/pages/deployment/status/${this.process.env['GITHUB_SHA']}`
+      const statusUrl = `https://api.github.com/repos/${this.repositoryNwo}/pages/deployment/status/${process.env['GITHUB_SHA']}`
       const timeout = core.getInput('timeout')
       const timeout_duration = core.getInput('timeout_duration')
       const error_count_max = core.getInput('error_count')
