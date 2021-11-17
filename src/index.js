@@ -13,6 +13,7 @@ const getContext = require('./context')
 
 // TODO: If the artifact hasn't been created, we can create it and upload to artifact storage ourselves
 // const tar = require('tar')
+let requestedDeployment = false
 class Deployment {
   constructor() {
     const context = getContext()
@@ -54,6 +55,7 @@ class Deployment {
           }
         }
       )
+      requestedDeployment = true
       core.info(`Created deployment for ${this.buildVersion}`)
       core.info(JSON.stringify(response.data))
     } catch (error) {
@@ -108,6 +110,29 @@ class Deployment {
   }
 }
 
+async function cancelHandler(evtOrExitCodeOrError) {
+  try {
+    if (requestedDeployment) {
+      const pagesCancelDeployEndpoint = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/pages/deployment/cancel/${process.env.GITHUB_SHA}`
+      await axios.put(
+        pagesCancelDeployEndpoint,
+        {},
+        {
+          headers: {
+            Accept: 'application/vnd.github.v3+json',
+            Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+            'Content-type': 'application/json'
+          }
+        }
+      )
+      core.info(`canceled ongoing deployment thru ${pagesCancelDeployEndpoint}`)
+    }
+  } catch (e) {
+    console.info('cancel deployment errored', e)
+  }
+  process.exit(isNaN(+evtOrExitCodeOrError) ? 1 : +evtOrExitCodeOrError)
+}
+
 async function main() {
   try {
     const deployment = new Deployment()
@@ -117,6 +142,8 @@ async function main() {
     core.setFailed(error)
   }
 }
+
+;['SIGINT', 'SIGTERM'].forEach(evt => process.on(evt, cancelHandler))
 
 main()
 
