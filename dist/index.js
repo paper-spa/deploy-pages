@@ -6665,7 +6665,9 @@ async function main() {
   }
 }
 
-;['SIGINT', 'SIGTERM'].forEach(evt => process.on(evt, cancelHandler))
+process.on('SIGINT', cancelHandler)
+
+process.on('SIGTERM', cancelHandler)
 
 main()
 
