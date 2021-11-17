@@ -101,6 +101,7 @@ describe('create', () => {
     expect(core.info).toHaveBeenCalledWith(
       'Created deployment for valid-build-version'
     )
+
     scope.done()
   })
 
@@ -137,6 +138,7 @@ describe('create', () => {
       'Failed to create deployment for invalid-build-version.'
     )
     expect(core.setFailed).toHaveBeenCalledWith({status: 400})
+
     scope.done()
   })
 })
