@@ -107,23 +107,6 @@ async function check() {
   }
 }
 
-async function emitTelemetry(){
-  const telemetryUrl = `https://api.github.com/repos/${context.repositoryNwo}/pages/telemetry`
-  const runId = process.env['GITHUB_RUN_ID']
-  core.info(`Sending telemetry for run id ${runId}`)
-  await axios.post(
-    telemetryUrl,
-    {github_run_id: runId},
-    {
-      headers: {
-        Accept: 'application/vnd.github.v3+json',
-        Authorization: `Bearer ${context.githubToken}`,
-        'Content-type': 'application/json'
-      }
-    }
-  )
-}
-
 function ensureContext() {
   for (const variable in context) {
     if (context[variable] === undefined) {
@@ -137,7 +120,6 @@ async function main() {
     ensureContext()
     await create()
     await check()
-    await emitTelemetry()
   } catch (error) {
     core.setFailed(error)
   }
