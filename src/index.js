@@ -115,6 +115,7 @@ function ensureContext() {
   }
   core.debug('all variables are set')
 }
+
 async function main() {
   try {
     ensureContext()
