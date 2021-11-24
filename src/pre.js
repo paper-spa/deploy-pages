@@ -53,7 +53,7 @@ async function main() {
     ensureContext()
     await emitTelemetry()
   } catch (error) {
-    core.setFailed(error)
+    core.error("failed to emit pages build telemetry")
   }
 }
 
