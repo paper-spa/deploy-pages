@@ -7,6 +7,7 @@
     "@actions/artifact": "^0.5.2",
     "@actions/core": "^1.6.0",
     "axios": "^0.24.0",
+    "axios-retry": "^3.2.4",
     "tar": "^6.1.11"
   },
   "devDependencies": {
@@ -19,8 +20,8 @@
     "prettier": "^2.4.1"
   },
   "scripts": {
-    "lint": "eslint .",
-    "prepare": "ncc build src/index.js -o dist --source-map --license licenses.txt",
+    "lint": "eslint src",
+    "prepare": "ncc build src/index.js -o dist --source-map --license licenses.txt && ncc build src/pre.js -o pre --source-map --license licenses.txt",
     "test": "jest",
     "all": "npm run lint && npm run prepare && npm run test"
   },
