@@ -7181,21 +7181,21 @@ var __webpack_exports__ = {};
 (() => {
 const core = __nccwpck_require__(2186)
 const axios = __nccwpck_require__(6545)
-const axiosRetry = __nccwpck_require__(9179);
+const axiosRetry = __nccwpck_require__(9179)
 const retryAttempt = 3
 
 axiosRetry(axios, {
   retries: retryAttempt,
   retryDelay: (retryCount) => {
     core.info(`retrying to send pages telemetry with attempt: ${retryCount}`)
-    return retryCount * 5000; // time interval between retries
+    return retryCount * 1000 // time interval between retries, with 1s, 2s, 3s
   },
 
   // retry on error greater than 500
   retryCondition: (error) => {
-    return error.response.status >= 500;
+    return error.response.status >= 500
   },
-});
+})
 
 // All variables we need from the runtime are loaded here
 const context = __nccwpck_require__(1319)
@@ -7224,9 +7224,9 @@ async function emitTelemetry(){
     }
   ).catch((err) => {
     if (err.response.status !== 200) {
-      throw new Error(`failed to emit metric with status code: ${err.response.status} after ${retryAttempt} retry attempts`);
+      throw new Error(`failed to emit metric with status code: ${err.response.status} after ${retryAttempt} retry attempts`)
     }
-  });
+  })
 }
 
 async function main() {
