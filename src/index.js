@@ -30,6 +30,9 @@ async function create() {
       }
     })
     core.info(JSON.stringify(data))
+    if (data.value.length == 0) {
+      throw new Error("not found uploaded artifact!")
+    }
     const artifactUrl = `${data.value[0].url}&%24expand=SignedContent`
     const response = await axios.post(
       pagesDeployEndpoint,
