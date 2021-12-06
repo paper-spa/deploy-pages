@@ -142,3 +142,63 @@ describe('create', () => {
     scope.done()
   })
 })
+
+describe('check', () => {
+  beforeAll(() => {
+    process.env.ACTIONS_RUNTIME_URL = 'http://my-url/'
+    process.env.GITHUB_RUN_ID = '123'
+    process.env.ACTIONS_RUNTIME_TOKEN = 'a-token'
+    process.env.GITHUB_REPOSITORY = 'paper-spa/is-awesome'
+    process.env.GITHUB_TOKEN = 'gha-token'
+    process.env.GITHUB_SHA = '123abc'
+    process.env.GITHUB_ACTOR = 'monalisa'
+    process.env.GITHUB_ACTION = '__monalisa/octocat'
+    process.env.GITHUB_ACTION_PATH = 'something'
+
+    jest.spyOn(core, 'setOutput').mockImplementation(param => {
+      return param
+    })
+
+    jest.spyOn(core, 'setFailed').mockImplementation(param => {
+      return param
+    })
+    // Mock error/warning/info/debug
+    jest.spyOn(core, 'error').mockImplementation(jest.fn())
+    jest.spyOn(core, 'warning').mockImplementation(jest.fn())
+    jest.spyOn(core, 'info').mockImplementation(jest.fn())
+    jest.spyOn(core, 'debug').mockImplementation(jest.fn())
+  })
+
+  it('sets output to success when deployment is succeessful', async () => {
+    process.env.GITHUB_SHA = 'valid-build-version'
+    let repositoryNwo = process.env.GITHUB_REPOSITORY
+    let buildVersion = process.env.GITHUB_SHA
+
+    axios.get = jest.fn().mockResolvedValue({
+      status: 200,
+      data: {
+        status: 'succeed'
+      }
+    })
+
+    // Create the deployment
+    const deployment = new Deployment()
+
+    core.getInput = jest.fn('timeout').mockReturnValue(60)
+    jest.spyOn(core, 'getInput')
+    await deployment.check()
+
+    expect(axios.get).toBeCalledWith(
+      `https://api.github.com/repos/${repositoryNwo}/pages/deployment/status/${buildVersion}`,
+      {
+        headers: {
+          Authorization: 'token '
+        }
+      }
+    )
+
+    expect(core.setOutput).toBeCalledWith('status', 'succeed')
+
+    expect(core.info).toHaveBeenCalledWith('Reported success!')
+  })
+})
