@@ -117,30 +117,34 @@ describe('create', () => {
 
     // Create the deployment
     const deployment = new Deployment()
-    await deployment.create()
+    try {
+      deployment.create()
+    } catch(err) {
 
-    expect(axios.post).toBeCalledWith(
-      'https://api.github.com/repos/paper-spa/is-awesome/pages/deployment',
-      {
-        artifact_url: 'https://invalid-artifact.com&%24expand=SignedContent',
-        pages_build_version: 'invalid-build-version'
-      },
-      {
-        headers: {
-          Accept: 'application/vnd.github.v3+json',
-          Authorization: 'Bearer ',
-          'Content-type': 'application/json'
+      expect(axios.post).toBeCalledWith(
+        'https://api.github.com/repos/paper-spa/is-awesome/pages/deployment',
+        {
+          artifact_url: 'https://invalid-artifact.com&%24expand=SignedContent',
+          pages_build_version: 'invalid-build-version'
+        },
+        {
+          headers: {
+            Accept: 'application/vnd.github.v3+json',
+            Authorization: 'Bearer ',
+            'Content-type': 'application/json'
+          }
         }
-      }
-    )
+      )
 
-    expect(core.info).toHaveBeenLastCalledWith(
-      'Failed to create deployment for invalid-build-version.'
-    )
-    expect(core.setFailed).toHaveBeenCalledWith({status: 400})
+      expect(core.info).toHaveBeenLastCalledWith(
+        'Failed to create deployment for invalid-build-version.'
+      )
+      expect(core.setFailed).toHaveBeenCalledWith({status: 400})
 
-    scope.done()
+      scope.done()
+    }
   })
+
 })
 
 describe('check', () => {
@@ -174,6 +178,10 @@ describe('check', () => {
     let repositoryNwo = process.env.GITHUB_REPOSITORY
     let buildVersion = process.env.GITHUB_SHA
 
+    // mock a successful call to create a deployment
+    axios.post = jest.fn().mockResolvedValue({status: 200})
+
+    // mock a completed deployment with status = 'succeed'
     axios.get = jest.fn().mockResolvedValue({
       status: 200,
       data: {
