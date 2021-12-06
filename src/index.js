@@ -26,46 +26,6 @@ class Deployment {
     this.githubToken = context.githubToken
     this.workflowRun = context.workflowRun
   }
-  // Ask the runtime for the unsigned artifact URL and deploy to GitHub Pages
-  // by creating a deployment with that artifact
-  async create() {
-    try {
-      core.info(`Actor: ${context.buildActor}`)
-      core.info(`Action ID: ${context.actionsId}`)
-      const pagesDeployEndpoint = `https://api.github.com/repos/${context.repositoryNwo}/pages/deployment`
-      const artifactExgUrl = `${context.runTimeUrl}_apis/pipelines/workflows/${context.workflowRun}/artifacts?api-version=6.0-preview`
-      core.info(`Artifact URL: ${artifactExgUrl}`)
-      const {data} = await axios.get(artifactExgUrl, {
-        headers: {
-          Authorization: `Bearer ${context.runTimeToken}`,
-          'Content-Type': 'application/json'
-        }
-      })
-      core.info(JSON.stringify(data))
-      if (data.value.length == 0) {
-        throw new Error("not found uploaded artifact!")
-      }
-      const artifactUrl = `${data.value[0].url}&%24expand=SignedContent`
-      const response = await axios.post(
-        pagesDeployEndpoint,
-        {artifact_url: artifactUrl, pages_build_version: context.buildVersion},
-        {
-          headers: {
-            Accept: 'application/vnd.github.v3+json',
-            Authorization: `Bearer ${context.githubToken}`,
-            'Content-type': 'application/json'
-          }
-        }
-      )
-      requestedDeployment = true
-      core.info(`Created deployment for ${context.buildVersion}`)
-      core.info(JSON.stringify(response.data))
-    } catch (error) {
-      core.info('Failed to create deployment.')
-      // Throw the error, so it will skip check deployment status. This error will be caught again in global try catch.
-      throw error
-    }
-  }
 
   // Ask the runtime for the unsigned artifact URL and deploy to GitHub Pages
   // by creating a deployment with that artifact
@@ -83,6 +43,9 @@ class Deployment {
         }
       })
       core.info(JSON.stringify(data))
+      if (data.value.length ==0) {
+        throw new Error('No uploaded artifact was found!')
+      }
       const artifactUrl = `${data.value[0].url}&%24expand=SignedContent`
       const response = await axios.post(
         pagesDeployEndpoint,
@@ -147,31 +110,6 @@ class Deployment {
     } catch (error) {
       core.setFailed(error)
     }
-    if (tries >= timeout) {
-      core.info('Timeout reached, aborting!')
-      core.setFailed('Timeout reached, aborting!')
-    }
-  } catch (error) {
-    core.setFailed(error)
-  }
-}
-
-function ensureContext() {
-  for (const variable in context) {
-    if (context[variable] === undefined) {
-      throw new Error(`${variable} is undefined. Cannot continue.`)
-    }
-  }
-  core.debug('all variables are set')
-}
-
-async function main() {
-  try {
-    ensureContext()
-    await create()
-    await check()
-  } catch (error) {
-    core.setFailed(error)
   }
 }
 
