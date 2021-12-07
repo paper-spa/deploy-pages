@@ -162,4 +162,4 @@ process.on('SIGTERM', cancelHandler)
 
 main()
 
-module.exports = Deployment
+module.exports = {Deployment}
