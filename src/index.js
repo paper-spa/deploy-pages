@@ -36,20 +36,24 @@ class Deployment {
       const pagesDeployEndpoint = `https://api.github.com/repos/${this.repositoryNwo}/pages/deployment`
       const artifactExgUrl = `${this.runTimeUrl}_apis/pipelines/workflows/${this.workflowRun}/artifacts?api-version=6.0-preview`
       core.info(`Artifact URL: ${artifactExgUrl}`)
-      const {data} = await axios.get(artifactExgUrl, {
+      const { data } = await axios.get(artifactExgUrl, {
         headers: {
           Authorization: `Bearer ${this.runTimeToken}`,
           'Content-Type': 'application/json'
         }
       })
       core.info(JSON.stringify(data))
-      if (data.value.length ==0) {
+      if (data.value.length == 0) {
         throw new Error('No uploaded artifact was found!')
       }
       const artifactUrl = `${data.value[0].url}&%24expand=SignedContent`
       const response = await axios.post(
         pagesDeployEndpoint,
-        {artifact_url: artifactUrl, pages_build_version: this.buildVersion},
+        {
+          artifact_url: artifactUrl,
+          pages_build_version: this.buildVersion,
+          workflow_run_id: this.actionsId
+        },
         {
           headers: {
             Accept: 'application/vnd.github.v3+json',
@@ -162,4 +166,4 @@ process.on('SIGTERM', cancelHandler)
 
 main()
 
-module.exports = {Deployment}
+module.exports = { Deployment }
