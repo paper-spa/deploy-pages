@@ -47,21 +47,19 @@ class Deployment {
         throw new Error('No uploaded artifact was found!')
       }
       const artifactUrl = `${data.value[0].url}&%24expand=SignedContent`
-      const response = await axios.post(
-        pagesDeployEndpoint,
-        {
-          artifact_url: artifactUrl,
-          pages_build_version: this.buildVersion,
-          oidc_token: idToken,
-        },
-        {
-          headers: {
-            Accept: 'application/vnd.github.v3+json',
-            Authorization: `Bearer ${this.githubToken}`,
-            'Content-type': 'application/json'
-          }
+      const payload = {
+        artifact_url: artifactUrl,
+        pages_build_version: this.buildVersion,
+        oidc_token: idToken
+      }
+      core.info(`Creating deployment with payload:\n${JSON.stringify(payload, null, '\t')}`)
+      const response = await axios.post(pagesDeployEndpoint, payload, {
+        headers: {
+          Accept: 'application/vnd.github.v3+json',
+          Authorization: `Bearer ${this.githubToken}`,
+          'Content-type': 'application/json'
         }
-      )
+      })
       requestedDeployment = true
       core.info(`Created deployment for ${this.buildVersion}`)
       core.info(JSON.stringify(response.data))
