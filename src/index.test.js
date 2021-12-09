@@ -7,7 +7,7 @@ const axios = require('axios')
 
 const {expect, jest} = require('@jest/globals')
 
-const {Deployment} = require('./index')
+const {Deployment} = require('./deployment')
 
 describe('with all environment variables set', () => {
   beforeEach(() => {

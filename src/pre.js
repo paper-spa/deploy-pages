@@ -16,8 +16,7 @@ axiosRetry(axios, {
   }
 })
 
-const {Deployment} = require('./index')
-
+const {Deployment} = require('./deployment')
 
 async function emitTelemetry() {
   // All variables we need from the runtime are set in the Deployment constructor
