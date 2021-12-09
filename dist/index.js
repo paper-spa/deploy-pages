@@ -6551,7 +6551,7 @@ class Deployment {
 
   // Ask the runtime for the unsigned artifact URL and deploy to GitHub Pages
   // by creating a deployment with that artifact
-  async create() {
+  async create(idToken) {
     try {
       core.info(`Actor: ${this.buildActor}`)
       core.info(`Action ID: ${this.actionsId}`)
@@ -6565,21 +6565,23 @@ class Deployment {
         }
       })
       core.info(JSON.stringify(data))
-      if (data.value.length ==0) {
+      if (data.value.length == 0) {
         throw new Error('No uploaded artifact was found!')
       }
       const artifactUrl = `${data.value[0].url}&%24expand=SignedContent`
-      const response = await axios.post(
-        pagesDeployEndpoint,
-        {artifact_url: artifactUrl, pages_build_version: this.buildVersion},
-        {
-          headers: {
-            Accept: 'application/vnd.github.v3+json',
-            Authorization: `Bearer ${this.githubToken}`,
-            'Content-type': 'application/json'
-          }
+      const payload = {
+        artifact_url: artifactUrl,
+        pages_build_version: this.buildVersion,
+        oidc_token: idToken
+      }
+      core.info(`Creating deployment with payload:\n${JSON.stringify(payload, null, '\t')}`)
+      const response = await axios.post(pagesDeployEndpoint, payload, {
+        headers: {
+          Accept: 'application/vnd.github.v3+json',
+          Authorization: `Bearer ${this.githubToken}`,
+          'Content-type': 'application/json'
         }
-      )
+      })
       requestedDeployment = true
       core.info(`Created deployment for ${this.buildVersion}`)
       core.info(JSON.stringify(response.data))
@@ -6612,15 +6614,15 @@ class Deployment {
           core.setOutput('status', 'succeed')
           break
         } else if (res.data.status == 'deployment_failed') {
-
           // Fall into permanent error, it may be caused by ongoing incident or malicious deployment content or exhausted automatic retry times.
           core.info('Deployment failed, try again later.')
           core.setOutput('status', 'failed')
           break
         } else if (res.data.status == 'deployment_attempt_error') {
-
           // A temporary error happened, a retry will be scheduled automatically.
-          core.info('Deployment temporarily failed, a retry will be automatically scheduled...')
+          core.info(
+            'Deployment temporarily failed, a retry will be automatically scheduled...'
+          )
         } else {
           core.info('Current status: ' + res.data.status)
         }
@@ -6671,7 +6673,8 @@ async function cancelHandler(evtOrExitCodeOrError) {
 async function main() {
   try {
     const deployment = new Deployment()
-    await deployment.create()
+    const idToken = await core.getIDToken()
+    await deployment.create(idToken)
     await deployment.check()
   } catch (error) {
     core.setFailed(error)
