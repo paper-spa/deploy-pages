@@ -7109,6 +7109,9 @@ class Deployment {
       core.info(JSON.stringify(response.data))
     } catch (error) {
       core.info(`Failed to create deployment for ${this.buildVersion}.`)
+      if (error.response && error.response.data) {
+        console.log(error.response.data)
+      }
       throw error
     }
   }
