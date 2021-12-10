@@ -39,13 +39,13 @@ class Deployment {
       core.info(`Artifact URL: ${artifactExgUrl}`)
 
 
-      var cancled_check = await axios.get(statusUrl, {
+      var cancelled = await axios.get(statusUrl, {
         headers: {
           Authorization: `token ${this.githubToken}`
         }
       })
 
-      if (cancled_check.data.status == 'deployment_cancelled') {
+      if (cancelled.data.status == 'deployment_cancelled') {
         throw new Error('Deployment cancelled. (Probably because of a newer run)')
       }
 
