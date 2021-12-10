@@ -35,8 +35,22 @@ class Deployment {
       core.info(`Action ID: ${this.actionsId}`)
       const pagesDeployEndpoint = `https://api.github.com/repos/${this.repositoryNwo}/pages/deployment`
       const artifactExgUrl = `${this.runTimeUrl}_apis/pipelines/workflows/${this.workflowRun}/artifacts?api-version=6.0-preview`
+      const statusUrl = `https://api.github.com/repos/${this.repositoryNwo}/pages/deployment/status/${process.env['GITHUB_SHA']}`
       core.info(`Artifact URL: ${artifactExgUrl}`)
-      const {data} = await axios.get(artifactExgUrl, {
+
+
+      var cancled_check = await axios.get(statusUrl, {
+        headers: {
+          Authorization: `token ${this.githubToken}`
+        }
+      })
+
+      if (cancled_check.data.status == 'deployment_cancelled') {
+        throw new Error('Deployment cancelled. (Probably because of a newer run)')
+      }
+
+
+      const { data } = await axios.get(artifactExgUrl, {
         headers: {
           Authorization: `Bearer ${this.runTimeToken}`,
           'Content-Type': 'application/json'
@@ -101,6 +115,8 @@ class Deployment {
           core.info(
             'Deployment temporarily failed, a retry will be automatically scheduled...'
           )
+        } else if (res.data.status == 'deployment_cancelled') {
+          core.info('Deployment cancelled. (Probably from another run)')
         } else {
           core.info('Current status: ' + res.data.status)
         }
@@ -165,4 +181,4 @@ process.on('SIGTERM', cancelHandler)
 
 main()
 
-module.exports = {Deployment}
+module.exports = { Deployment }
