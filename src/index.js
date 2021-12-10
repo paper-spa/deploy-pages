@@ -117,6 +117,8 @@ class Deployment {
           )
         } else if (res.data.status == 'deployment_cancelled') {
           core.info('Deployment cancelled. (Probably from another run)')
+          core.setOutput('status', 'cancelled')
+          break
         } else {
           core.info('Current status: ' + res.data.status)
         }
