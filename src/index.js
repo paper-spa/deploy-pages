@@ -25,6 +25,7 @@ class Deployment {
     this.actionsId = context.workflowRun
     this.githubToken = context.githubToken
     this.workflowRun = context.workflowRun
+    this.buildId = context.GITHUB_PAGE_BUILD_ID
   }
 
   // Ask the runtime for the unsigned artifact URL and deploy to GitHub Pages
@@ -36,7 +37,7 @@ class Deployment {
       const pagesDeployEndpoint = `https://api.github.com/repos/${this.repositoryNwo}/pages/deployment`
       const artifactExgUrl = `${this.runTimeUrl}_apis/pipelines/workflows/${this.workflowRun}/artifacts?api-version=6.0-preview`
       core.info(`Artifact URL: ${artifactExgUrl}`)
-      const {data} = await axios.get(artifactExgUrl, {
+      const { data } = await axios.get(artifactExgUrl, {
         headers: {
           Authorization: `Bearer ${this.runTimeToken}`,
           'Content-Type': 'application/json'
@@ -50,7 +51,8 @@ class Deployment {
       const payload = {
         artifact_url: artifactUrl,
         pages_build_version: this.buildVersion,
-        oidc_token: idToken
+        oidc_token: idToken,
+        build_id: this.buildId
       }
       core.info(`Creating deployment with payload:\n${JSON.stringify(payload, null, '\t')}`)
       const response = await axios.post(pagesDeployEndpoint, payload, {
@@ -165,4 +167,4 @@ process.on('SIGTERM', cancelHandler)
 
 main()
 
-module.exports = {Deployment}
+module.exports = { Deployment }
