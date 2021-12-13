@@ -35,8 +35,8 @@ describe('with variables missing', () => {
   it('execution fails if there are missing variables', done => {
     delete process.env.ACTIONS_RUNTIME_URL
     const ip = path.join(__dirname, './index.js')
-    cp.exec(`node ${ip}`, {env: process.env}, (err, stderr) => {
-      expect(stderr).toMatch(/undefined. Cannot continue/)
+    cp.exec(`node ${ip}`, {env: process.env}, (err, stdout) => {
+      expect(stdout).toBe("")
       expect(err).toBeTruthy()
       expect(err.code).toBe(1)
       done()
