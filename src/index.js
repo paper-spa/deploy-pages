@@ -17,7 +17,6 @@ const deployment = new Deployment()
 async function cancelHandler(evtOrExitCodeOrError) {
   try {
     if (deployment.requestedDeployment) {
-      console.log('test')
       const pagesCancelDeployEndpoint = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/pages/deployment/cancel/${process.env.GITHUB_SHA}`
       await axios.put(
         pagesCancelDeployEndpoint,
