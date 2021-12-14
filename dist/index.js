@@ -6490,7 +6490,7 @@ exports.debug = debug; // for test
 const core = __nccwpck_require__(2186)
 
 // Load variables from Actions runtime
-const getRequiredVars = () => {
+function getRequiredVars() {
   return {
     runTimeUrl: process.env.ACTIONS_RUNTIME_URL,
     workflowRun: process.env.GITHUB_RUN_ID,
