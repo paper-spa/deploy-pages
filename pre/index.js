@@ -7080,7 +7080,7 @@ class Deployment {
       const pagesDeployEndpoint = `https://api.github.com/repos/${this.repositoryNwo}/pages/deployment`
       const artifactExgUrl = `${this.runTimeUrl}_apis/pipelines/workflows/${this.workflowRun}/artifacts?api-version=6.0-preview`
       core.info(`Artifact URL: ${artifactExgUrl}`)
-      const {data} = await axios.get(artifactExgUrl, {
+      const { data } = await axios.get(artifactExgUrl, {
         headers: {
           Authorization: `Bearer ${this.runTimeToken}`,
           'Content-Type': 'application/json'
@@ -7118,19 +7118,24 @@ class Deployment {
     try {
       const statusUrl = `https://api.github.com/repos/${this.repositoryNwo}/pages/deployment/status/${process.env['GITHUB_SHA']}`
       const timeout = core.getInput('timeout')
-      const timeout_duration = core.getInput('timeout_duration')
-      const error_count_max = core.getInput('error_count')
-      var tries = 0
-      var error_count = 0
-      while (tries < timeout) {
-        tries++
-        await new Promise(r => setTimeout(r, timeout_duration))
+      const reportingInterval = core.getInput('reporting_interval')
+      const maxErrorCount = core.getInput('error_count')
+      var startTime = Date.now()
+      var errorCount = 0
+
+      /*eslint no-constant-condition: ["error", { "checkLoops": false }]*/
+      while (true) {
+        // Handle reporting interval
+        if (reportingInterval > 0) {
+          await new Promise(r => setTimeout(r, reportingInterval))
+        }
+
+        // Check status
         var res = await axios.get(statusUrl, {
           headers: {
             Authorization: `token ${this.githubToken}`
           }
         })
-
         if (res.data.status == 'succeed') {
           core.info('Reported success!')
           core.setOutput('status', 'succeed')
@@ -7149,19 +7154,22 @@ class Deployment {
           core.info('Current status: ' + res.data.status)
         }
 
+        // Handle max error count
         if (res.status != 200) {
-          error_count++
+          errorCount++
         }
-
-        if (error_count >= error_count_max) {
+        if (errorCount >= maxErrorCount) {
           core.info('Too many errors, aborting!')
           core.setFailed('Failed with status code: ' + res.status)
           break
         }
-      }
-      if (tries >= timeout) {
-        core.info('Timeout reached, aborting!')
-        core.setFailed('Timeout reached, aborting!')
+
+        // Handle timeout
+        if (Date.now() - startTime >= timeout) {
+          core.info('Timeout reached, aborting!')
+          core.setFailed('Timeout reached, aborting!')
+          break
+        }
       }
     } catch (error) {
       core.setFailed(error)
@@ -7184,10 +7192,10 @@ async function cancelHandler(evtOrExitCodeOrError) {
           }
         }
       )
-      core.info(`canceled ongoing deployment thru ${pagesCancelDeployEndpoint}`)
+      core.info(`Deployment cancelled with ${pagesCancelDeployEndpoint}`)
     }
   } catch (e) {
-    console.info('cancel deployment errored', e)
+    console.info('Deployment cancellation failed', e)
   }
   process.exit(isNaN(+evtOrExitCodeOrError) ? 1 : +evtOrExitCodeOrError)
 }
@@ -7203,13 +7211,15 @@ async function main() {
   }
 }
 
+// Register signal handlers for workflow cancellation
 process.on('SIGINT', cancelHandler)
-
 process.on('SIGTERM', cancelHandler)
 
+// Main
 main()
 
-module.exports = {Deployment}
+// Export the Deployment class (for tests)
+module.exports = { Deployment }
 
 
 /***/ }),
