@@ -29,10 +29,10 @@ async function cancelHandler(evtOrExitCodeOrError) {
           }
         }
       )
-      core.info(`canceled ongoing deployment thru ${pagesCancelDeployEndpoint}`)
+      core.info(`Deployment cancelled with ${pagesCancelDeployEndpoint}`)
     }
   } catch (e) {
-    console.info('cancel deployment errored', e)
+    console.info('Deployment cancellation failed', e)
   }
   process.exit(isNaN(+evtOrExitCodeOrError) ? 1 : +evtOrExitCodeOrError)
 }
@@ -47,8 +47,9 @@ async function main() {
   }
 }
 
+// Register signal handlers for workflow cancellation
 process.on('SIGINT', cancelHandler)
-
 process.on('SIGTERM', cancelHandler)
 
+// Main
 main()

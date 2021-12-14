@@ -7112,13 +7112,19 @@ class Deployment {
       try {
         const statusUrl = `https://api.github.com/repos/${this.repositoryNwo}/pages/deployment/status/${process.env['GITHUB_SHA']}`
         const timeout = core.getInput('timeout')
-        const timeout_duration = core.getInput('timeout_duration')
-        const error_count_max = core.getInput('error_count')
-        var tries = 0
-        var error_count = 0
-        while (tries < timeout) {
-          tries++
-          await new Promise(r => setTimeout(r, timeout_duration))
+        const reportingInterval = core.getInput('reporting_interval')
+        const maxErrorCount = core.getInput('error_count')
+        var startTime = Date.now()
+        var errorCount = 0
+
+        /*eslint no-constant-condition: ["error", { "checkLoops": false }]*/
+        while (true) {
+          // Handle reporting interval
+          if (reportingInterval > 0) {
+            await new Promise(r => setTimeout(r, reportingInterval))
+          }
+
+          // Check status
           var res = await axios.get(statusUrl, {
             headers: {
               Authorization: `token ${this.githubToken}`
@@ -7144,18 +7150,20 @@ class Deployment {
           }
 
           if (res.status != 200) {
-            error_count++
+            errorCount++
           }
 
-          if (error_count >= error_count_max) {
+          if (errorCount >= maxErrorCount) {
             core.info('Too many errors, aborting!')
             core.setFailed('Failed with status code: ' + res.status)
             break
           }
         }
-        if (tries >= timeout) {
+        // Handle timeout
+        if (Date.now() - startTime >= timeout) {
           core.info('Timeout reached, aborting!')
           core.setFailed('Timeout reached, aborting!')
+          return
         }
       } catch (error) {
         core.setFailed(error)
