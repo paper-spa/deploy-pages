@@ -10,7 +10,7 @@ inputs:
     default: ${{ github.token }}
     required: true
   timeout:
-    description: 'The time in milliseconds after which to timeout and cancel the deployment (default: 10 minutes)'
+    description: 'Time in milliseconds after which to timeout and cancel the deployment (default: 10 minutes)'
     required: false
     default: "600000"
   error_count:
@@ -18,6 +18,6 @@ inputs:
     required: false
     default: "10"
   reporting_interval:
-    description: 'The time in milliseconds between two deployment status report (default: 1 second)'
+    description: 'Time in milliseconds between two deployment status report (default: 1 second)'
     required: false
     default: "1000"
