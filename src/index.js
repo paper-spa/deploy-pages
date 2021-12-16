@@ -43,7 +43,7 @@ async function main() {
     await deployment.create(idToken)
     await deployment.check()
   } catch (error) {
-    core.info(JSON.stringify(error))
+
     core.setFailed(error)
   }
 }
@@ -53,4 +53,4 @@ process.on('SIGINT', cancelHandler)
 process.on('SIGTERM', cancelHandler)
 
 // Main
-main()
+main().then(() => require('./pre'))
