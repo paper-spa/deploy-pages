@@ -43,6 +43,7 @@ async function main() {
     await deployment.create(idToken)
     await deployment.check()
   } catch (error) {
+    core.info(JSON.stringify(error))
     core.setFailed(error)
   }
 }
