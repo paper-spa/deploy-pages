@@ -53,4 +53,4 @@ process.on('SIGINT', cancelHandler)
 process.on('SIGTERM', cancelHandler)
 
 // Main
-main().then(() => require('./pre').emitTelemetry())
+main().then(() => require('./pre'))
