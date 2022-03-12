@@ -9,6 +9,10 @@ inputs:
     description: 'GitHub token'
     default: ${{ github.token }}
     required: true
+  workflow_run:
+    description: 'The Actions workflow run ID containing the uploaded artifact to deploy'
+    required: true
+    default: ${{ github.run_id }}
   preview:
     description: 'Is this attempting to deploy a pull request as a GitHub Pages preview site?'
     required: false
