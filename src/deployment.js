@@ -14,7 +14,7 @@ class Deployment {
       this.runTimeToken = context.runTimeToken
       this.buildVersion = context.buildVersion
       this.buildActor = context.buildActor
-      this.actionsId = context.workflowRun
+      this.actionsId = context.actionsId
       this.githubToken = context.githubToken
       this.workflowRun = context.workflowRun
       this.isPreview = context.isPreview === true
