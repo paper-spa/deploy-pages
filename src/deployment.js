@@ -17,6 +17,7 @@ class Deployment {
       this.actionsId = context.workflowRun
       this.githubToken = context.githubToken
       this.workflowRun = context.workflowRun
+      this.isPreview = context.isPreview === true
       this.requestedDeployment = false
     }
 
@@ -43,7 +44,8 @@ class Deployment {
         const payload = {
           artifact_url: artifactUrl,
           pages_build_version: this.buildVersion,
-          oidc_token: idToken
+          oidc_token: idToken,
+          preview: this.isPreview
         }
         core.info(`Creating deployment with payload:\n${JSON.stringify(payload, null, '\t')}`)
         const response = await axios.post(pagesDeployEndpoint, payload, {
