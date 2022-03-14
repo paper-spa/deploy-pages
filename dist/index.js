@@ -6567,8 +6567,10 @@ class Deployment {
         const payload = {
           artifact_url: artifactUrl,
           pages_build_version: this.buildVersion,
-          oidc_token: idToken,
-          preview: this.isPreview
+          oidc_token: idToken
+        }
+        if (this.isPreview === true) {
+          payload.preview = true
         }
         core.info(`Creating deployment with payload:\n${JSON.stringify(payload, null, '\t')}`)
         const response = await axios.post(pagesDeployEndpoint, payload, {
