@@ -6499,7 +6499,8 @@ function getRequiredVars() {
     buildVersion: process.env.GITHUB_SHA,
     buildActor: process.env.GITHUB_ACTOR,
     actionsId: process.env.GITHUB_ACTION,
-    githubToken: core.getInput('token')
+    githubToken: core.getInput('token'),
+    isPreview: core.getInput('preview') === 'true'
   }
 }
 
@@ -6536,9 +6537,10 @@ class Deployment {
       this.runTimeToken = context.runTimeToken
       this.buildVersion = context.buildVersion
       this.buildActor = context.buildActor
-      this.actionsId = context.workflowRun
+      this.actionsId = context.actionsId
       this.githubToken = context.githubToken
       this.workflowRun = context.workflowRun
+      this.isPreview = context.isPreview === true
       this.requestedDeployment = false
     }
 
@@ -6565,7 +6567,8 @@ class Deployment {
         const payload = {
           artifact_url: artifactUrl,
           pages_build_version: this.buildVersion,
-          oidc_token: idToken
+          oidc_token: idToken,
+          preview: this.isPreview
         }
         core.info(`Creating deployment with payload:\n${JSON.stringify(payload, null, '\t')}`)
         const response = await axios.post(pagesDeployEndpoint, payload, {
@@ -6851,6 +6854,7 @@ async function main() {
     await deployment.create(idToken)
     await deployment.check()
   } catch (error) {
+    core.info(JSON.stringify(error))
     core.setFailed(error)
   }
 }
