@@ -21,69 +21,6 @@ class Deployment {
       this.requestedDeployment = false
     }
 
-    async getArtifactUrlForActiveRun(artifactRunId) {
-      const artifactExgUrl = `${this.runTimeUrl}_apis/pipelines/workflows/${artifactRunId}/artifacts?api-version=6.0-preview`
-      core.info(`Artifacts URL: ${artifactExgUrl}`)
-
-      const { data } = await axios.get(artifactExgUrl, {
-        headers: {
-          Authorization: `Bearer ${this.runTimeToken}`,
-          'Content-Type': 'application/json'
-        }
-      })
-      core.info(JSON.stringify(data))
-      if (data.value.length === 0) {
-        throw new Error('No uploaded artifact was found!')
-      }
-
-      const artifactUrl = `${data.value[0].url}&%24expand=SignedContent`
-      core.info(`Artifact URL: ${artifactUrl}`)
-      return artifactUrl
-    }
-
-    async getArtifactUrlForSeparateRun(artifactRunId) {
-      const artifactExgUrl = `https://api.github.com/repos/${this.repositoryNwo}/actions/runs/${artifactRunId}/artifacts`
-
-      core.info(`Artifacts URL: ${artifactExgUrl}`)
-      const { data } = await axios.get(artifactExgUrl, {
-        headers: {
-          Accept: 'application/vnd.github.v3+json',
-          Authorization: `Bearer ${this.githubToken}`,
-          'Content-Type': 'application/json'
-        }
-      })
-      core.info(JSON.stringify(data))
-      if (data.total_count === 0 || data.artifacts.length === 0) {
-        throw new Error('No uploaded artifact was found!')
-      }
-
-      const pagesArtifact = data.artifacts.find(({ name }) => name === 'github-pages') || data.artifacts[0]
-      const artifactInfoUrl = pagesArtifact.archive_download_url
-
-      const { headers: { location: { artifactUrl } } } = await axios.get(artifactInfoUrl, {
-        headers: {
-          Accept: 'application/vnd.github.v3+json',
-          Authorization: `Bearer ${this.githubToken}`,
-          'Content-Type': 'application/json'
-        },
-        maxRedirects: 0
-      })
-
-      core.info(`Artifact URL: ${artifactUrl}`)
-      return artifactUrl
-    }
-
-    getArtifactUrl() {
-      const artifactRunId = this.sourceWorkflowRun || this.workflowRun
-
-      // Requesting deployment of an artifact from the separate workflow run
-      if (artifactRunId !== this.workflowRun) {
-        return this.getArtifactUrlForSeparateRun(artifactRunId)
-      }
-
-      return this.getArtifactUrlForActiveRun(artifactRunId)
-    }
-
     // Ask the runtime for the unsigned artifact URL and deploy to GitHub Pages
     // by creating a deployment with that artifact
     async create(idToken) {
@@ -91,8 +28,19 @@ class Deployment {
         core.info(`Actor: ${this.buildActor}`)
         core.info(`Action ID: ${this.actionsId}`)
         const pagesDeployEndpoint = `https://api.github.com/repos/${this.repositoryNwo}/pages/deployment`
-
-        const artifactUrl = await this.getArtifactUrl()
+        const artifactExgUrl = `${this.runTimeUrl}_apis/pipelines/workflows/${this.workflowRun}/artifacts?api-version=6.0-preview`
+        core.info(`Artifact URL: ${artifactExgUrl}`)
+        const {data} = await axios.get(artifactExgUrl, {
+          headers: {
+            Authorization: `Bearer ${this.runTimeToken}`,
+            'Content-Type': 'application/json'
+          }
+        })
+        core.info(JSON.stringify(data))
+        if (data.value.length == 0) {
+          throw new Error('No uploaded artifact was found!')
+        }
+        const artifactUrl = `${data.value[0].url}&%24expand=SignedContent`
         const payload = {
           artifact_url: artifactUrl,
           pages_build_version: this.buildVersion,
@@ -100,7 +48,6 @@ class Deployment {
           preview: this.isPreview
         }
         core.info(`Creating deployment with payload:\n${JSON.stringify(payload, null, '\t')}`)
-
         const response = await axios.post(pagesDeployEndpoint, payload, {
           headers: {
             Accept: 'application/vnd.github.v3+json',
