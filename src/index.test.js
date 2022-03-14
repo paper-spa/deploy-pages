@@ -118,8 +118,12 @@ describe('create', () => {
     core.getIDToken = jest.fn().mockResolvedValue(fakeJwt)
     axios.post = jest.fn().mockResolvedValue('test')
 
+    // Return `"true"` for `core.getInput("preview")`
+    core.GetInput = jest.fn(input => { if (input === 'preview') return 'true' })
+    jest.spyOn(core, 'getInput')
+
     // Create the deployment
-    const deployment = new Deployment({ isPreview: true })
+    const deployment = new Deployment()
     await deployment.create(fakeJwt)
 
     expect(axios.post).toBeCalledWith(
