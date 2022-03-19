@@ -63,7 +63,7 @@ class Deployment {
       } catch (error) {
         if (error.response && error.response.data) {
           console.log("*****error log******")
-          core.info(error.response.data)
+          core.info(JSON.stringify(error.response.data))
           console.log("*****error log******")
         }
         core.info(`Failed to create deployment for ${this.buildVersion}.`)
