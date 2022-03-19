@@ -6584,6 +6584,11 @@ class Deployment {
         core.info(`Created deployment for ${this.buildVersion}`)
         core.info(JSON.stringify(response.data))
       } catch (error) {
+        if (error.response && error.response.data) {
+          console.log("*****error log******")
+          core.info(error.response.data)
+          console.log("*****error log******")
+        }
         core.info(`Failed to create deployment for ${this.buildVersion}.`)
         core.setFailed(error)
         throw error
