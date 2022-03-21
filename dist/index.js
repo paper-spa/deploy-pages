@@ -6660,6 +6660,11 @@ class Deployment {
           return
         }
       } catch (error) {
+        if (error.response && error.response.data) {
+          console.log("*****error log******")
+          core.info(JSON.stringify(error.response.data))
+          console.log("*****error log******")
+        }
         core.setFailed(error)
       }
     }
