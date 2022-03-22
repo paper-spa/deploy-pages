@@ -7021,7 +7021,8 @@ function getRequiredVars() {
     buildVersion: process.env.GITHUB_SHA,
     buildActor: process.env.GITHUB_ACTOR,
     actionsId: process.env.GITHUB_ACTION,
-    githubToken: core.getInput('token')
+    githubToken: core.getInput('token'),
+    isPreview: core.getInput('preview') === 'true'
   }
 }
 
@@ -7058,9 +7059,10 @@ class Deployment {
       this.runTimeToken = context.runTimeToken
       this.buildVersion = context.buildVersion
       this.buildActor = context.buildActor
-      this.actionsId = context.workflowRun
+      this.actionsId = context.actionsId
       this.githubToken = context.githubToken
       this.workflowRun = context.workflowRun
+      this.isPreview = context.isPreview === true
       this.requestedDeployment = false
     }
 
@@ -7089,6 +7091,9 @@ class Deployment {
           pages_build_version: this.buildVersion,
           oidc_token: idToken
         }
+        if (this.isPreview === true) {
+          payload.preview = true
+        }
         core.info(`Creating deployment with payload:\n${JSON.stringify(payload, null, '\t')}`)
         const response = await axios.post(pagesDeployEndpoint, payload, {
           headers: {
@@ -7100,7 +7105,13 @@ class Deployment {
         this.requestedDeployment = true
         core.info(`Created deployment for ${this.buildVersion}`)
         core.info(JSON.stringify(response.data))
+        this.deploymentInfo = response.data
       } catch (error) {
+        if (error.response && error.response.data) {
+          console.log("*****error log******")
+          core.info(JSON.stringify(error.response.data))
+          console.log("*****error log******")
+        }
         core.info(`Failed to create deployment for ${this.buildVersion}.`)
         core.setFailed(error)
         throw error
@@ -7110,7 +7121,13 @@ class Deployment {
     // Poll the deployment endpoint for status
     async check() {
       try {
-        const statusUrl = `https://api.github.com/repos/${this.repositoryNwo}/pages/deployment/status/${process.env['GITHUB_SHA']}`
+        const statusUrl = this.deploymentInfo != null ?
+        this.deploymentInfo["status_url"] : `https://api.github.com/repos/${this.repositoryNwo}/pages/deployment/status/${process.env['GITHUB_SHA']}`
+        var page_url = this.deploymentInfo != null ? this.deploymentInfo["page_url"] : ""
+        if (this.deploymentInfo != null && this.deploymentInfo["preview_url"] != "") {
+          page_url = `https://${this.deploymentInfo["preview_url"]}`
+        }
+        core.setOutput('page_url', page_url)
         const timeout = core.getInput('timeout')
         const reportingInterval = core.getInput('reporting_interval')
         const maxErrorCount = core.getInput('error_count')
@@ -7166,6 +7183,11 @@ class Deployment {
           return
         }
       } catch (error) {
+        if (error.response && error.response.data) {
+          console.log("*****error log******")
+          core.info(JSON.stringify(error.response.data))
+          console.log("*****error log******")
+        }
         core.setFailed(error)
       }
     }

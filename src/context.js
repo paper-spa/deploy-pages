@@ -10,7 +10,8 @@ function getRequiredVars() {
     buildVersion: process.env.GITHUB_SHA,
     buildActor: process.env.GITHUB_ACTOR,
     actionsId: process.env.GITHUB_ACTION,
-    githubToken: core.getInput('token')
+    githubToken: core.getInput('token'),
+    isPreview: core.getInput('preview') === 'true'
   }
 }
 
