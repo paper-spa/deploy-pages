@@ -7121,7 +7121,8 @@ class Deployment {
     // Poll the deployment endpoint for status
     async check() {
       try {
-        const statusUrl = `https://api.github.com/repos/${this.repositoryNwo}/pages/deployment/status/${process.env['GITHUB_SHA']}`
+        const statusUrl = this.deploymentInfo != null ?
+        this.deploymentInfo["status_url"] : `https://api.github.com/repos/${this.repositoryNwo}/pages/deployment/status/${process.env['GITHUB_SHA']}`
         var page_url = this.deploymentInfo != null ? this.deploymentInfo["page_url"] : ""
         if (this.deploymentInfo != null && this.deploymentInfo["preview_url"] != "") {
           page_url = `https://${this.deploymentInfo["preview_url"]}`
