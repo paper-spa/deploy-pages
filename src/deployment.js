@@ -13,6 +13,7 @@ class Deployment {
       this.repositoryNwo = context.repositoryNwo
       this.runTimeToken = context.runTimeToken
       this.buildVersion = context.buildVersion
+      this.ref = context.ref
       this.buildActor = context.buildActor
       this.actionsId = context.actionsId
       this.githubToken = context.githubToken
@@ -30,7 +31,7 @@ class Deployment {
         const pagesDeployEndpoint = `https://api.github.com/repos/${this.repositoryNwo}/pages/deployment`
         const artifactExgUrl = `${this.runTimeUrl}_apis/pipelines/workflows/${this.workflowRun}/artifacts?api-version=6.0-preview`
         core.info(`Artifact URL: ${artifactExgUrl}`)
-        const {data} = await axios.get(artifactExgUrl, {
+        const { data } = await axios.get(artifactExgUrl, {
           headers: {
             Authorization: `Bearer ${this.runTimeToken}`,
             'Content-Type': 'application/json'
@@ -44,6 +45,7 @@ class Deployment {
         const payload = {
           artifact_url: artifactUrl,
           pages_build_version: this.buildVersion,
+          ref: this.ref,
           oidc_token: idToken
         }
         if (this.isPreview === true) {
@@ -77,7 +79,7 @@ class Deployment {
     async check() {
       try {
         const statusUrl = this.deploymentInfo != null ?
-        this.deploymentInfo["status_url"] : `https://api.github.com/repos/${this.repositoryNwo}/pages/deployment/status/${process.env['GITHUB_SHA']}`
+        this.deploymentInfo["status_url"] : `https://api.github.com/repos/${this.repositoryNwo}/pages/deployment/status/${this.buildVersion}`
         var page_url = this.deploymentInfo != null ? this.deploymentInfo["page_url"] : ""
         if (this.deploymentInfo != null && this.deploymentInfo["preview_url"] != "") {
           page_url = `https://${this.deploymentInfo["preview_url"]}`
