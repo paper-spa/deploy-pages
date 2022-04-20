@@ -7122,10 +7122,12 @@ class Deployment {
     async check() {
       try {
         const statusUrl = this.deploymentInfo != null ?
-        this.deploymentInfo["status_url"] : `https://api.github.com/repos/${this.repositoryNwo}/pages/deployment/status/${process.env['GITHUB_SHA']}`
+          this.deploymentInfo["status_url"] : `https://api.github.com/repos/${this.repositoryNwo}/pages/deployment/status/${this.buildVersion}`
         var page_url = this.deploymentInfo != null ? this.deploymentInfo["page_url"] : ""
-        if (this.deploymentInfo != null && this.deploymentInfo["preview_url"] != "") {
-          page_url = `https://${this.deploymentInfo["preview_url"]}`
+        const previewUrl = this.deploymentInfo != null ? this.deploymentInfo["preview_url"] : ""
+        if (this.isPreview && previewUrl) {
+          const urlPrefix = previewUrl.test(/^https?:\/\//) ? "" : "https://"
+          page_url = `${urlPrefix}${previewUrl}`
         }
         core.setOutput('page_url', page_url)
         const timeout = core.getInput('timeout')
