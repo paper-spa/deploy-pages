@@ -27,6 +27,4 @@ inputs:
     default: "1000"
 outputs:
   page_url:
-    description: 'URL to deployed Github Pages'
-  preview_url:
-    description: 'URL to deployed Github Pages preview site'
+    description: 'URL to deployed GitHub Pages'
