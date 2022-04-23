@@ -81,8 +81,7 @@ class Deployment {
         var page_url = this.deploymentInfo != null ? this.deploymentInfo["page_url"] : ""
         const previewUrl = this.deploymentInfo != null ? this.deploymentInfo["preview_url"] : ""
         if (this.isPreview && previewUrl) {
-          const urlPrefix = /^https?:\/\//.test(previewUrl) ? "" : "https://"
-          page_url = `${urlPrefix}${previewUrl}`
+          page_url = previewUrl
         }
         core.setOutput('page_url', page_url)
         const timeout = core.getInput('timeout')
